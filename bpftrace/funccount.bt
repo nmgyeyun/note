@@ -1,0 +1,27 @@
+#!/usr/bin/env bpftrace
+
+// bpftrace -e 'k:tcp_* { @[probe] = count(); }'
+// bpftrace -e 'k:tcp_*  { @[probe] = count(); } interval:s:1 { time("%H:%M:%S\n"); print(@, 20); clear(@); }'
+
+BEGIN
+{
+    printf("Tracing ... Hit Ctrl-C to end.\n");
+}
+
+k:tcp_* 
+{
+    @[probe] = count(); 
+}
+
+interval:s:1
+{
+    time("%H:%M:%S \n");
+    print(@, 20);
+    clear(@);
+} 
+
+END
+{
+    print(@, 20);
+    clear(@);
+}

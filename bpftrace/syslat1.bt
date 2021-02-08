@@ -1,0 +1,41 @@
+#!/usr/bin/env bpftrace
+
+// bpftrace -e 'tracepoint:raws_syscalls:sys_enter { @ = hist(args->count); }'
+
+
+BEGIN
+{
+    printf("Tracing ... Hit Ctrl-C to end.\n");
+}
+
+tracepoint:raw_syscalls:sys_enter
+{
+    @start[tid, args->id] = nsecs;
+    @cnt[ksym(*(kaddr("sys_call_table") + args->id * 8))] = count();
+}
+
+tracepoint:raw_syscalls:sys_exit
+/@start[tid, args->id]/
+{
+    $syscall = ksym(*(kaddr("sys_call_table") + args->id * 8));
+    $us = (nsecs - @start[tid, args->id]) / 1000;
+    
+    @lat_us[comm, tid, $syscall] = hist($us);
+    @lat_max[comm, tid, $syscall] = max($us);
+    @lat_avg[comm, tid, $syscall] = avg($us);
+
+    delete(@start[tid, args->id]);
+}
+
+END
+{
+    print(@lat_us, 20);
+    print(@lat_max, 20);
+    print(@lat_avg, 20);
+
+    clear(@start);
+
+    clear(@lat_us);
+    clear(@lat_max);
+    clear(@lat_avg);
+}

@@ -1,0 +1,39 @@
+#!/usr/bin/env bpftrace
+
+// bpftrace -e 'tracepoint:syscalls:sys_enter_read { @ = hist(args->count); }'
+// bpftrace -e 'tracepoint:syscalls:sys_enter_read { @[comm, tid] = hist(args->count); }'
+
+// bpftrace -e 'tracepoint:syscalls:sys_exit_read { @ = hist(args->ret); }'
+// bpftrace -e 'tracepoint:syscalls:sys_exit_read { @[comm, tid] = hist(args->ret); }'
+
+// 统计出错原因
+// bpftrace -e 'tracepoint:syscalls:sys_exit_read /args->ret < 0/ { @ = lhist(-args->ret, 0, 100, 1); }'
+
+
+BEGIN
+{
+    printf("Tracing ... Hit Ctrl-C to end.\n");
+}
+
+t:syscalls:sys_enter_read
+{
+    @start[comm, tid] = nsecs; 
+}
+
+t:syscalls:sys_exit_read
+/@start[comm, tid]/
+{
+    $dur = (nsecs - @start[comm, tid]) / 1000;
+    @us = hist($dur);
+    @us_max = max($dur);
+    @us_avg = avg($dur);
+
+    delete(@start[comm, tid]);
+}
+
+END
+{
+    print(@us, 20);
+
+    clear(@start);
+}

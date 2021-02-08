@@ -1,0 +1,30 @@
+#!/usr/bin/env bpftrace
+
+// bpftrace -e 'tracepoint:raw_syscalls:sys_enter { @[comm, pid] = count(); }'
+
+// bpftrace -e 'tracepoint:syscalls:sys_enter_* { @[comm, pid] = count(); }'
+// bpftrace -e 'tracepoint:syscalls:sys_enter_* { @[comm, probe] = count(); }'
+// bpftrace -e 'tracepoint:syscalls:sys_enter_* { @[probe] = count(); }'
+
+BEGIN
+{
+    printf("Tracing ... Hit Ctrl-C to end.\n");
+}
+
+tracepoint:syscalls:sys_enter_*
+{
+    @cnt[comm, probe] = count(); 
+}
+
+interval:s:1
+{
+    time("%H:%M:%S PIDs/sec\n");
+    print(@cnt, 20);
+    clear(@cnt);
+} 
+
+END
+{
+    print(@cnt, 20);
+    clear(@cnt);
+}

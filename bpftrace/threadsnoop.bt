@@ -1,0 +1,11 @@
+#!/usr/bin/env bpftrace
+
+BEGIN
+{
+    printf("Tracing ... Hit Ctrl-C to end.\n");
+}
+
+u:/lib64/libpthread.so:pthread_create
+{
+    printf("%-32s by %-16s pid %-5d\n", probe, comm, pid);
+}

@@ -1,0 +1,10 @@
+#!/usr/bin/env bpftrace
+
+// bpftrace -e 'profile:hz:49 /pid/ {@samples[ustack, kstack, comm] = count();} '
+
+
+profile:hz:49
+/pid/
+{
+    @samples[ustack, kstack, comm] = count();
+}
