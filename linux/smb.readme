@@ -1,3 +1,44 @@
-dnf install smb
+# https://www.linuxtechi.com/install-configure-samba-centos-8/
 
+# 1.
+dnf install samba -y
+
+# 2.
 smbpasswd -a root
+
+# 3.cfg
+#[root@localhost note]# cat /etc/samba/smb.conf
+[global]
+workgroup = WORKGROUP
+netbios name=Vma
+security = user
+map to guest = Bad User
+ 
+[home]
+comment = my test
+path = /home
+#valid users = $root
+browseable = yes
+writable = yes
+guest ok = no
+
+[share]
+comment = my test
+valid users = $root
+path = /var/share/
+browseable = yes
+
+
+# 4. firwall
+firewall-cmd --permanent --add-service=samba
+
+systemctl stop firewalld.service 
+systemctl disable firewalld.service 
+
+# 5. restart
+systemctl restart firewalld.service 
+systemctl enable firewalld.service 
+
+
+writable = yes
+guest ok = no
