@@ -1,0 +1,3 @@
+dnf install smb
+
+smbpasswd -a root
