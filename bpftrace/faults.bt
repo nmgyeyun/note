@@ -1,0 +1,11 @@
+#!/usr/bin/env bpftrace
+
+BEGIN
+{
+    printf("Tracing brk... Hit Ctrl-C to end.\n");
+}
+
+software:page-faults:1
+{
+    @[ustack, comm] = count();
+}
