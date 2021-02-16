@@ -1,0 +1,27 @@
+
+bpftrace -e 'kprobe:sock_sendmsg { @[comm] = count(); }'
+
+
+bpftrace -e 't:syscalls:sys_enter_accept* { @[pid, comm] = count(); }'
+bpftrace -e 't:syscalls:sys_enter_connect { @[pid, comm] = count(); }'
+
+
+bpftrace -e 'k:sock_sendmsg,k:sock_recvmsg { @[probe, pid, comm] = count(); }'
+bpftrace -e 'kr:sock_sendmsg,kr:sock_recvmsg /(int32)retval > 0/ { @[probe, pid, comm] = sum((int32)retval); }'
+
+
+bpftrace -e 'k:sock_sendmsg,k:sock*recvmsg { @[probe, comm, pid] = count(); }'
+
+
+bpftrace -e 'k:tcp_* { @[probe] = count(); }'
+bpftrace -e 'k:tcp_* { @[probe, pid, comm] = count(); }'
+
+
+bpftrace -e 'k:tcp_sendmsg { @send_bytes = hist(arg2); }'
+bpftrace -e 'kr:tcp_recvmsg /retval > 0/ { @recv_bytes = hist(retval); }'
+
+
+bpftrace -e 'k:udp_sendmsg { @send_bytes = hist(arg2); }'
+bpftrace -e 'kr:udp_recvmsg /retval > 0/ { @recv_bytes = hist(retval); }'
+
+

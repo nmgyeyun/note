@@ -1,0 +1,11 @@
+
+bpftrace -e 't:block:*  {@[probe]=count()}'
+
+bpftrace -e 't:block:block_rq_issue {@bytes= hist(args->bytes);}'
+
+bpftrace -e 't:block:block_rq_issue {@[ustack, kstack] = count()}'
+
+
+bpftrace -e 't:block:block_rq_issue {@[args->rwbs] = count()}'
+
+bpftrace -e 't:block:block_rq_issue /args->dev==0/ {@[kstack]=count()}'

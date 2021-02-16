@@ -1,0 +1,32 @@
+#!/usr/local/bin/bpftrace
+/*
+ * tcpaccept-tp - Trace TCP passive connections (accept()) using tracepoints.
+ *
+ * See BPF Performance Tools, Chapter 10, for an explanation of this tool.
+ *
+ * Copyright (c) 2019 Brendan Gregg.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * This was originally created for the BPF Performance Tools book
+ * published by Addison Wesley. ISBN-13: 9780136554820
+ * When copying or porting, include this comment.
+ *
+ * 07-Apr-2019  Brendan Gregg   Created this.
+ */
+
+#include <net/tcp_states.h>
+#include <linux/socket.h>
+
+BEGIN
+{
+	printf("%-8s %-3s %-14s %-5s %-14s %-5s\n", "TIME", "IP",
+	    "RADDR", "RPORT", "LADDR", "LPORT");
+}
+
+tracepoint:sock:inet_sock_set_state
+/args->oldstate == TCP_SYN_RECV && args->newstate == TCP_ESTABLISHED/
+{
+	time("%H:%M:%S ");
+	printf("%-3d %-14s %-5d %-14s %-5d\n", args->family == AF_INET ? 4 : 6,
+	    ntop(args->family, args->daddr), args->dport,
+	    ntop(args->family, args->saddr), args->sport);
+}
