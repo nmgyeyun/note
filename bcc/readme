@@ -1,0 +1,14 @@
+
+https://github.com/iovisor/bcc
+
+
+https://github.com/iovisor/bcc/blob/master/docs/reference_guide.md
+
+
+https://github.com/iovisor/bcc/blob/master/INSTALL.md#rhel---binary
+
+
+
+sudo yum install kernel-headers-$(uname -r | cut -d'.' -f1-5)
+sudo yum install kernel-devel-$(uname -r | cut -d'.' -f1-5)
+sudo yum install bcc
