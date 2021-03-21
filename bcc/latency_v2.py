@@ -4,7 +4,7 @@
 from __future__ import print_function
 from bcc import BPF
 from ctypes import c_ushort, c_int, c_ulonglong
-from time import sleep
+from time import sleep, strftime
 from sys import argv
 import argparse
 
@@ -12,38 +12,46 @@ bpf_text = """
 #include <uapi/linux/ptrace.h>
 #include <linux/sched.h>
 
-
-struct key_t {
-    u64 ts;
+typedef struct api_key {
     u32 pid;
     char comm[TASK_COMM_LEN];
-    char api[64];    
-};
+    char api[64];
+} api_key_t;
 
-struct value_t {
+typedef struct ts_key {
+    u64 ts;
+    api_key_t key;
+} ts_key_t;
+
+typedef struct st_value {
     u64 min;
 	u64 max;
 	u64 sum;
 	u64 count;
-};
+} st_value_t;
+
+typedef struct dist_key {
+    api_key_t key;
+    u64 slot;
+} dist_key_t;
 
 
-BPF_HASH(status, struct key_t, struct value_t);
-BPF_HASH(start, u32, struct key_t);
-BPF_HISTOGRAM(dist);
+BPF_HASH(start, u32, ts_key_t);
+BPF_HASH(status, api_key_t, st_value_t);
+BPF_HISTOGRAM(dist, dist_key_t);
 
 int do_entry(struct pt_regs *ctx)
 {
     u32 pid;        
-    struct key_t val = {};    
+    ts_key_t val = {};    
     
     pid = bpf_get_current_pid_tgid();
     FILTER
 
-    val.pid = pid;
     val.ts = bpf_ktime_get_ns();
-    bpf_get_current_comm(&val.comm, sizeof(val.comm));
-    bpf_probe_read_user(&val.api, sizeof(val.api), (void *)PT_REGS_PARM1(ctx));
+    val.key.pid = pid;
+    bpf_get_current_comm(&val.key.comm, sizeof(val.key.comm));
+    bpf_probe_read_user(&val.key.api, sizeof(val.key.api) - 1, (void *)PT_REGS_PARM1(ctx));
 
     start.update(&pid, &val);
 
@@ -54,43 +62,48 @@ int do_return(struct pt_regs *ctx)
 {
 	u32 pid;
 	u64 delta;
-	struct key_t key = {}, *p_key;
-	struct value_t val = {}, *p_val;
+	ts_key_t ts = {}, *p_ts;
+    api_key_t st_k;  
+	st_value_t st_val = {}, *p_st_val;
+
+    dist_key_t dk = {};
 
 	pid = bpf_get_current_pid_tgid();
     FILTER
 
-	p_key = start.lookup(&pid);
-    if (!p_key) {
+	p_ts = start.lookup(&pid);
+    if (!p_ts) {
         return 0;
     }
+	delta = (bpf_ktime_get_ns() - p_ts->ts) / 1000;
 
-	delta = (bpf_ktime_get_ns() - p_key->ts) / 1000;
-	dist.increment(bpf_log2l(delta));
-
-    key = *p_key;
-    key.ts = 0;
-	p_val = status.lookup(&key);
-	if (p_val) {
-
-		p_val->count += 1;
-		p_val->sum += delta;
-		p_val->min = delta;
-		if (delta > p_val->max) {
-			p_val->max = delta;
+    st_k = p_ts->key;
+	p_st_val = status.lookup(&st_k);
+	if (p_st_val) {
+		p_st_val->count += 1;
+		p_st_val->sum += delta;
+		p_st_val->min = delta;
+		if (delta > p_st_val->max) {
+			p_st_val->max = delta;
 		}
-		if (delta < val.min) {
-			p_val->min = delta;
-		}			
-		status.update(&key, p_val);
+		if (delta < p_st_val->min) {
+			p_st_val->min = delta;
+		}
+		status.update(&st_k, p_st_val);
 	} else {
-		val.count = 1;
-		val.sum = delta;
-		val.min = delta;
-		val.max = delta;
+		st_val.count = 1;
+		st_val.sum = delta;
+		st_val.min = delta;
+		st_val.max = delta;
 
-		status.insert(&key, &val);
+		status.insert(&st_k, &st_val);
+
+		p_st_val = &st_val;
 	}
+
+    dk.key = p_ts->key;
+    dk.slot = bpf_log2l(delta);
+	dist.increment(dk);
 
 	start.delete(&pid);
 
@@ -153,6 +166,10 @@ if args.debug:
 # header
 print("Tracing... Hit Ctrl-C to end.")
 
+def print_section(key):
+    # return "%s,%s,%s" % (key[0], key[1], key[2])
+    return str(key)
+
 
 def main():
     do_exit = 0
@@ -163,8 +180,12 @@ def main():
         except KeyboardInterrupt:
             pass; do_exit = 1
 
-        if (verbose):
-            b["dist"].print_log2_hist("usecs")
+        print("[%s]" % strftime("%H:%M:%S"))
+
+        if verbose:
+            #b["dist"].print_log2_hist("usecs")
+            b["dist"].print_log2_hist("usecs", "latency(us)", 
+                        section_print_fn=print_section, bucket_fn=lambda k: (k.comm, k.pid, k.api))
             b["dist"].clear()
 
 
@@ -178,6 +199,7 @@ def main():
                 break
             print("%-16s %-6s %-32s %-16s %-16s %-16s %-16s %-16d" 
                     % (k.comm, k.pid, k.api, v.min, v.max, v.count, v.sum, v.sum / v.count))        
+        status.clear()
         
         if do_exit:
             exit()
