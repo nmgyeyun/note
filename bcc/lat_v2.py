@@ -20,24 +20,31 @@ from bcc import BPF
 from ctypes import c_ushort, c_int, c_ulonglong
 from time import sleep
 from sys import argv
-#import fire 
+import argparse
 
-def usage():
-	print("USAGE: %s [interval [count]]" % argv[0])
-	exit()
 
 # arguments
-interval = 5
-count = -1
-if len(argv) > 1:
-	try:
-		interval = int(argv[1])
-		if interval == 0:
-			raise
-		if len(argv) > 2:
-			count = int(argv[2])
-	except:	# also catches -h, --help
-		usage()
+examples = """examples:
+    ./lat_v2                 # ... trace all process use idl
+    ./lat_v2 -p 185          # ... trace PID 185, output top10
+    ./lat_v2 -p 185 -t 10    # ... trace PID 185, output top10
+    ./lat_v2 -p 185 -t 10 -i 5    # ... trace PID 185, output top10 every 5 seconds
+"""
+parser = argparse.ArgumentParser(
+    description="Trace and print idl call latency",
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+    epilog=examples)
+parser.add_argument("-p", "--pid", help="trace this PID only")
+parser.add_argument("-t", "--top", help="show top N of max latency")
+parser.add_argument("-i", "--interval", help="show latency interval")
+parser.add_argument("-v", "--verbose", action="store_true", help="print more hists")
+args = parser.parse_args()
+topn = args.top
+pid = args.pid
+g_interval = args.interval
+verbose = args.verbose
+debug = 0
+
 
 # load BPF program
 b = BPF(src_file = "lat_v2.c")
@@ -47,41 +54,42 @@ b.attach_uretprobe(name="/home/note/bcc/test", sym="func_test_lat", fn_name="do_
 # header
 print("Tracing... Hit Ctrl-C to end.")
 
+
 def main():
     # print("%-16s %-6s %-32s %-16s %-16s %-16s %-16s %-16s\n" % ("COMM", "PID", "API", "MIN", "MAX", "COUNT", "SUM", "AVG"))
+    if g_interval:
+        interval = g_interval
+    else:
+        interval = 999999999
 
-    loop = 0
     do_exit = 0
     while (1):
-        if count > 0:
-            loop += 1
-            if loop > count:
-                exit()
+
         try:
             sleep(interval)
         except KeyboardInterrupt:
             pass; do_exit = 1
-    
+
         print("==\n")
-        #b["dist"].print_log2_hist("usecs")
-        b["dist"].clear()
+        if (verbose):
+            #b["dist"].print_log2_hist("usecs")
+            b["dist"].clear()
 
-        status = b.get_table("status")
-
-        # for k, v in status.items():
-        #     print("%-16s %-6s %-32s %-16s %-16s %-16s %-16s %-16d" % (k.comm, k.pid, k.api, v.min, v.max, v.count, v.sum, v.sum / v.count))        
 
         print("%-16s %-6s %-32s %-16s %-16s %-16s %-16s %-16s" % ("COMM", "PID", "API", "MIN", "MAX", "COUNT", "SUM", "AVG"))
 
+        status = b.get_table("status")
+        i = topn
         for k, v in sorted(status.items(), key=lambda status: status[1].max, reverse=True):
+            i = i - 1
+            if topn and i <= 0:
+                break
             print("%-16s %-6s %-32s %-16s %-16s %-16s %-16s %-16d" 
                     % (k.comm, k.pid, k.api, v.min, v.max, v.count, v.sum, v.sum / v.count))        
         
         if do_exit:
             exit()
-    
-
+   
 
 if __name__ == '__main__':
-  # fire.Fire()
-  main()
+    main()
