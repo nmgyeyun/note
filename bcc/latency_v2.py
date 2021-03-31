@@ -52,6 +52,8 @@ int do_entry(struct pt_regs *ctx)
     val.key.pid = pid;
     bpf_get_current_comm(&val.key.comm, sizeof(val.key.comm));
     bpf_probe_read_user(&val.key.api, sizeof(val.key.api) - 1, (void *)PT_REGS_PARM1(ctx));
+    // kernel 4.19
+    // bpf_probe_read(&val.key.api, sizeof(val.key.api) - 1, (void *)PT_REGS_PARM1(ctx));
 
     start.update(&pid, &val);
 
