@@ -1,0 +1,5 @@
+
+# windows ssh key
+ssh-keygen -t rsa -C "nmgyeyun@126.com"
+# 默认生成key路径
+C:\Users\USERNAME\.ssh
