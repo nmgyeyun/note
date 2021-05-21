@@ -1,0 +1,29 @@
+
+dnf install vsftpd ftp lftp -y
+
+adduser ftpuser
+passwd ftpuser
+
+mkdir -p /home/ftpuser/ftp_dir
+chown -R ftpuser: /home/ftpuser/ftp_dir
+
+bash -c 'echo ftpuser >> /etc/vsftpd/user_list'
+
+
+
+vim /etc/vsftpd/vsftpd.conf
+anonymous_enable=NO
+local_enable=YES
+write_enable=YES
+
+chroot_local_user=NO
+chroot_list_enable=NO
+
+allow_writeable_chroot=YES
+
+systemctl restart vsftpd
+
+
+wget ftp://ip/xxx --ftp-user=xxxx --ftp-password=xxxx
+
+

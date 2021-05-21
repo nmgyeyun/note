@@ -1,0 +1,10 @@
+
+fsck
+
+
+e2fs
+
+smartctl -a /dev/sda
+
+
+badblocks -s -v -o /root/bb-sda.log /dev/vda
