@@ -3,6 +3,8 @@
 import unittest
 
 # 用于测试的类
+
+
 class TestClass(object):
     def add(self, x, y):
         return x + y
@@ -14,6 +16,8 @@ class TestClass(object):
         raise KeyError("test.")
 
 # 测试用例
+
+
 class utCase(unittest.TestCase):
     def setUp(self):
         self.test_class = TestClass()
@@ -30,6 +34,7 @@ class utCase(unittest.TestCase):
 
     def tearDown(self):
         del self.test_class
+
 
 if __name__ == "__main__":
     unittest.main()

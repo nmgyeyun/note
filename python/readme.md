@@ -20,3 +20,7 @@ random.uniform(0, 3)
 # 混淆代码
 pyminifier
 http://liftoff.github.io/pyminifier/
+
+
+# pypy
+http://pypy.org/download.html#default-with-a-jit-compiler
