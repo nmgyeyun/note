@@ -17,7 +17,11 @@ do_something()
 
 prof.disable()
 prof.create_stats()
+prof.dump_stats("./out.prof")
+
 # prof.print_stats()
 p = pstats.Stats(prof)
 p.sort_stats('tottime').print_stats(20)
+
+
 

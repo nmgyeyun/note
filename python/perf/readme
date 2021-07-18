@@ -1,19 +1,47 @@
 
 
+# 1.
+    python3 -m cProfile -o out.prof loop.py 
+
+
+# 2. 
+    import pstats
+    p=pstats.Stats("out.prof")
+    p.sort_stats('tottime').print_stats(20)
+
+    p.sort_stats('calls').print_stats()
+    p.sort_stats('cumulative').print_stats()
+
+
+    p.sort_stats('tottime').print_stats()
+    p.sort_stats('ncalls').print_stats()
+
+# 3.
+    python3 -c "import pstats; p=pstats.Stats('out.prof'); p.print_stats()"
+
+    # sort
+    python3 -c "import pstats; p=pstats.Stats('out.prof'); p.sort_stats('time').print_stats()"
+
+    # sort top20
+    python3 -c "import pstats; p=pstats.Stats('out.prof'); p.sort_stats('tottime').print_stats(20)"
+
+    sort_stats支持以下参数：
+    calls, cumulative, file, line, module, name, nfl, pcalls, stdname, time
+
+
+# 4. 图形化
+    dnf install graphviz -y
+
+    pip install gprof2dot
+    或者
+    git clone https://github.com/jrfonseca/gprof2dot.git
+
+    
+  
+    gprof2dot -f pstats out.prof | dot -Tpng -o out.png
 
 
 
-python3 -m cProfile -o test.stats loop.py
 
 
-import pstats
-p=pstats.Stats("./test.stats")
-p.sort_stats('tottime').print_stats(20)
-
-p.sort_stats('calls').print_stats()
-p.sort_stats('cumulative').print_stats()
-
-
-p.sort_stats('tottime').print_stats()
-p.sort_stats('ncalls').print_stats()
-
+python -m timeit loop.py

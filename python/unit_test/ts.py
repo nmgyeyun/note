@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-
+import os
 import unittest
 from test_class import utCase
-from HTMLTestRunner import HTMLTestRunner
+# from HTMLTestRunner import HTMLTestRunner
 
 
 def report_text():
@@ -26,6 +26,13 @@ def report_html():
                                 )
         runner.run(suite)
 
+def all_case():
+    cases =  unittest.TestLoader().discover(os.getcwd())
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(cases)
+
+
 if __name__ == '__main__':
-    report_html()
-    report_text()
+    # report_html()
+    # report_text()
+    all_case()
