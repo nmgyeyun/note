@@ -1,0 +1,51 @@
+安装pyrasite 和 objgraph
+pip install pyrasite     
+pip  install objgraph
+在pyrasite 中有个pyrasite-shell 
+工具，可以直接连上一个正在运行的python程序，打开一个类似ipython的交互终端来运行命令�
+��检查程序状态，这为调试提供了极大的方便。
+
+连接到有问题的python程序，开始收集信息
+pyrasite-shell <pid>
+>>>
+接下来就可以在进程里调用任意python代码，查看进程状态
+guppy 获取内存使用的各种对象占用情况，
+# pip install guppy
+guppy 
+可以打印各种对象所占空间大小，如果python进程中有未释放的对象，造成内存占用升高，�
+�通过guppy查看。
+
+以下步骤是通过pyrasite-shell，attach到目标进程后操作的。
+from guppy import hpy
+h = hpy()
+
+h.heap()
+# Partition of a set of 48477 objects. Total size = 3265516 bytes.
+#  Index  Count   %     Size   % Cumulative  % Kind (class / dict of class)
+#      0  25773  53  1612820  49   1612820  49 str
+#      1  11699  24   483960  15   2096780  64 tuple
+#      2    174   0   241584   7   2338364  72 dict of module
+#      3   3478   7   222592   7   2560956  78 types.CodeType
+#      4   3296   7   184576   6   2745532  84 function
+#      5    401   1   175112   5   2920644  89 dict of class
+#      6    108   0    81888   3   3002532  92 dict (no owner)
+#      7    114   0    79632   2   3082164  94 dict of type
+#      8    117   0    51336   2   3133500  96 type
+#      9    667   1    24012   1   3157512  97 __builtin__.wrapper_descriptor
+# <76 more rows. Type e.g. '_.more' to view.>h.iso(1,[],{})
+# Partition of a set of 3 objects. Total size = 176 bytes.
+#  Index  Count   %     Size   % Cumulative  % Kind (class / dict of class)
+#      0      1  33      136  77       136  77 dict (no owner)
+#      1      1  33       28  16       164  93 list
+#      2      1  33       12   7       176 100 int
+通过以上步骤可排除python进程中存在未释放的对象的可能。
+
+objgraph中 show_growth()
+函数统计自上次调用以来增加得最多的对象，这个函数非常有利于发现潜在的内存泄露。�
+�数内部调用了gc.collect()，因此即使有循环引用也不会对判断造成影响。
+
+通过pyrasite-shell pid  附加到运行中的进程中得到shell
+在shell下执行
+import objgraph
+objgraph.show_growth()   输出增长的对象
+就可以看到不断增长的对象，帮组我们定位到具体代码

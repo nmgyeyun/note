@@ -1,0 +1,24 @@
+https://wiki.python.org/moin/DebuggingWithGdb
+
+
+sudo apt-get install gdb python2.7-dbg
+
+
+GDB
+vim /etc/yum.repos.d/CentOS-Debuginfo.repo
+enabled=1
+ 
+yum install yum-utils -y
+debuginfo-install glibc
+yum install gdb python-debuginfo -y
+ 
+gdb python PID
+info thread
+py-list
+py-up
+py-down
+
+thread apply all py-list
+thread apply all py-bt
+
+
