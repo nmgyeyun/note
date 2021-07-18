@@ -1,0 +1,8 @@
+test_add_5_5 (test_class.utCase) ... skipped 'Skip test.'
+test_bool_value (test_class.utCase) ... ok
+test_raise (test_class.utCase) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.000s
+
+OK (skipped=1)

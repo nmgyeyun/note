@@ -1,0 +1,19 @@
+
+
+
+
+
+python3 -m cProfile -o test.stats loop.py
+
+
+import pstats
+p=pstats.Stats("./test.stats")
+p.sort_stats('tottime').print_stats(20)
+
+p.sort_stats('calls').print_stats()
+p.sort_stats('cumulative').print_stats()
+
+
+p.sort_stats('tottime').print_stats()
+p.sort_stats('ncalls').print_stats()
+
