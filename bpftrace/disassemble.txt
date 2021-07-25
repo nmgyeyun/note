@@ -1,0 +1,15 @@
+
+
+
+# gdb -q /usr/lib/debug/boot/vmlinux-`uname -r` --ex 'disassemble do_sys_open'
+Reading symbols from /usr/lib/debug/boot/vmlinux-5.0.0-32-generic...done.
+Dump of assembler code for function do_sys_open:
+   0xffffffff812b2ed0 <+0>:     callq  0xffffffff81c01820 <__fentry__>
+   0xffffffff812b2ed5 <+5>:     push   %rbp
+   0xffffffff812b2ed6 <+6>:     mov    %rsp,%rbp
+   0xffffffff812b2ed9 <+9>:     push   %r15
+...
+# bpftrace -e 'kprobe:do_sys_open+9 { printf("in here\n"); }'
+Attaching 1 probe...
+in here
+...
