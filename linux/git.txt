@@ -3,3 +3,47 @@
 ssh-keygen -t rsa -C "nmgyeyun@126.com"
 # 默认生成key路径
 C:\Users\USERNAME\.ssh
+
+
+
+git config -- global http.sslBackend "openssl"
+
+git config --global user.name "nmgyeyun"
+git config --global user.email "nmgyeyun@126.com"
+
+git config --global credential.helper store
+
+# 别名
+git config --global alias.co checkout
+git config --global alias.ci commit
+git config --global alias.br branch
+git config --global alias.ba "branch -a"
+git config --global alias.st status
+git config --global alias.pl pull
+git config --global alias.ps push
+git config --global alias.rtv "remote -v"
+git config --global alias.psom "push origin master"
+git config --global http.postBuffer 1073741824
+
+cat .gitconfig 
+[credential]
+        helper = store
+[user]
+        email = nmgyeyun@126.com
+        name = Xiaocheng Wang
+[core]
+        editor = vim
+
+[alias]
+    co = checkout
+    ci = commit
+    br = branch
+    ba = branch -a
+    st = status
+    pl = pull
+    ps = push
+    psom = push origin master 
+
+
+ssh-keygen -t rsa -C "nmgyeyun@126.com" -b 4096
+ssh-keygen -t rsa -C `hostname` -b 4096
