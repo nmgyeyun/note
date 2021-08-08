@@ -1,0 +1,26 @@
+# 文档前几行是标签
+# coredump
+# 调试
+
+
+开启core dump
+
+# 开启产生coredump，不限制大小
+ulimit -c unlimited
+# 指定core文件保存路径和文件名
+mkdir -p /var/core/
+echo "/var/core/core-%e-%p-%t" > /proc/sys/kernel/core_pattern
+
+# core_file可以使用以下通配符：
+%% 单个%字符
+%p 所dump进程的进程ID
+%u 所dump进程的实际用户ID
+%g 所dump进程的实际组ID
+%s 导致本次core dump的信号
+%t core dump的时间 (由1970年1月1日计起的秒数)
+%h 主机名
+%e 程序文件名
+
+
+# 查看当前limit
+ulimit -a

@@ -1,0 +1,6 @@
+# 发包工具
+# pktgen
+
+Pktgen
+https://www.kernel.org/doc/Documentation/networking/pktgen.txt
+pktgen_sample01_simple.sh 

@@ -1,0 +1,6 @@
+xargs 
+ls | xargs -t -i mv {} {}.bak
+
+ls | xargs -t -I i mv i i.bak
+
+

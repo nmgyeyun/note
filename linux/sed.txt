@@ -1,0 +1,18 @@
+SED
+
+sed -i '/rule test/!b;n;n;n;n;n;n;n;n; c\\tstep choose indep 0 type chassis\\nstep choose indep 2 type host\\nistep chooseleaf indep 1 type osd' crush.txt 
+
+
+替换
+sed -i 's/MYGROUP/WORKGROUP/g'    $MODFILE
+
+打印 
+sed -n '/security/p' $MODFILE
+ 
+追加
+# 如果文件为空，则不追加
+sed -i '$a so long\nso long' a.txt 
+
+sed -i '$a alias vim='/usr/bin/vim'' a.txt 
+
+

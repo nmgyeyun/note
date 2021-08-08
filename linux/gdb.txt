@@ -1,0 +1,32 @@
+GDB
+
+
+bt
+threads info
+info thread
+info r
+disassemble 
+
+info proc mappings
+info sharedlibrary 
+
+EXTRA_CFLAGS="-O0 -g"
+
+# gdb 设置参数
+gdb helloworld
+set args -c f -n 4
+
+
+gdb脚本
+# 执行的时候把空格去掉
+set $cnt=16
+set $i=0
+set $j=0
+while($i<=$cnt)
+	if (g_table[$i])
+		printf "g_table %p  %d \n", g_table[$i], $i
+        print (* (iphdr_t *)(xxxx[$i]) )
+	end
+	set $i++
+end
+
