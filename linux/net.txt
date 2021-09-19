@@ -1,0 +1,28 @@
+
+==============================================================================
+centos8配置静态IP
+
+# 查看网卡名字
+nmcli d
+
+vim /etc/sysconfig/network-scripts/ifcfg-ens33
+
+ONBOOT=yes 
+BOOTPROTO=static
+IPADDR=192.168.0.35
+NETMASK=255.255.255.0
+GATEWAY=192.168.0.1
+DNS1=114.114.114.114
+PREFIX=24
+
+IPV6INIT=yes
+IPV6_AUTOCONF=no
+IPV6ADDR=3001::10/64
+IPV6_DEFAULTGW=3001::1
+
+
+# 重启网卡，立即生效
+ifup ens33
+
+
+==============================================================================
