@@ -1,5 +1,19 @@
 
 ==============================================================================
+centos8 接口重命名
+
+vi /etc/default/grub
+GRUB_CMDLINE_LINUX 后增加 net.ifnames=0
+net.ifnames=0
+
+grub2-mkconfig  -o /boot/grub2/grub.cfg
+
+
+rename
+/etc/sysconfig/network-scripts/
+
+
+==============================================================================
 centos8配置静态IP
 
 # 查看网卡名字

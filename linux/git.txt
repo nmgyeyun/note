@@ -61,3 +61,15 @@ cat .gitconfig
 
 ssh-keygen -t rsa -C "nmgyeyun@126.com" -b 4096
 ssh-keygen -t rsa -C `hostname` -b 4096
+
+
+==============================================================================================================
+常见问题：
+1. 未能创建 SSL/TLS 安全通道
+[sangfor@msys note]$git ps
+fatal: 发送请求时出错。
+fatal: 请求被中止: 未能创建 SSL/TLS 安全通道。
+error: unable to read askpass response from 'C:/Program Files/Git/mingw64/bin/git-askpass.exe'
+
+解决：
+git clone git@github.com:nmgyeyun/note.git 
