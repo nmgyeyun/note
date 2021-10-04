@@ -27,7 +27,8 @@ comment = my test
 valid users = $root
 path = /var/share/
 browseable = yes
-
+writable = yes
+guest ok = no
 
 # 4. firwall
 firewall-cmd --permanent --add-service=samba
@@ -40,5 +41,6 @@ systemctl restart firewalld.service
 systemctl enable firewalld.service 
 
 
-writable = yes
-guest ok = no
+# 6. 如果可以连接，无法访问，关闭selinux
+1)确保setlinux关闭，可以用setenforce 0命令执行。 默认的，SELinux禁止网络上对Samba服务器上的共享目录进行写操作
+2)修改/etc/selinux/config 文件将SELINUX=enforcing改为SELINUX=disabled,这里注意要重启。
