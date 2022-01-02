@@ -1,0 +1,102 @@
+lvm
+
+ 
+LVM
+1. 创建pv
+pvcreate /dev/sda5
+pvs
+ 
+2. 扩容vg
+vgextend vg_c222 /dev/sda5
+pvdisplay
+vgdisplay
+ 
+3. 扩容lv
+lvs
+lvextend  -L +5G /dev/vg_c222/lv_root
+ 
+4. 扩容文件系统
+df -h
+resize2fs /dev/vg_c222/lv_root
+df -h
+ 
+5. 查看pv、vg
+pvdisplay
+vgdisplay
+
+
+缩容：
+
+强制文件系统检查命令: 
+e2fsck -f /dev/lbgvg/lbglv
+缩容逻辑边界,改为1G(会销毁数据)
+resize2fs /dev/lbgvg/lbglv 1G
+lvreduce -L 1G /dev/lbgvg/lbglv 
+查看
+lvs
+ 
+ 
+lvm命令
+ 
+物理卷操作命令：
+pvcreate
+pvscan
+pvdisplay
+pvs
+ 
+卷组操作命令
+vgcreate
+vgremove
+vgdisplay
+vgs
+ 
+逻辑卷操作命令
+lvcreate
+lvdisplay
+lvs
+ 
+man vgs
+man lvs
+man pvs
+ 
+# 查看支持的字段
+vgs -o help
+vgs -o name --noheadings | xargs -n 1 vgremove -f
+ 
+# -v 现实额外信息
+pvs -v
+lvs -v
+vgs -v
+ 
+格式化输出
+# 格式化输出
+# 只显示 pv_name,dev_size
+pvs -o pv_name,dev_size
+pvs -o pv_name,dev_size --noheadings
+ 
+# 增加显示字段
+pvs -o +pv_uuid
+ 
+# 排序
+ lvs -O lv_size
+ 
+# 输出tag
+devname=/dev/ceph-68112a0a-e549-46fa-ae9e-52a6b85fa38e/*
+lvs --noheadings --readonly --separator=',' -o lv_tags,lv_path,lv_name,vg_name ${devname}
+lvs --noheadings --readonly --separator=',' -o lv_tags,lv_path,lv_name,vg_name ${devname} | awk -v FS="," -v OFS="\n" '{$1=$1;print $0}'
+ 
+vgnames=`vgs --noheadings -o name`
+for vgname in `vgs --noheadings -o name`
+do
+devname=/dev/${vgname}/*
+echo "==================== ${devname} "====================
+lvs --noheadings --readonly --separator=',' -o lv_tags,lv_path,lv_name,vg_name ${devname} | awk -v FS="," -v OFS="\n" '{$1=$1;print $0}'
+done
+ 
+ 
+
+ 
+ 
+ 
+ 
+ 
