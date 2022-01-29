@@ -1,0 +1,8 @@
+
+# For Ubuntu20.10+
+sudo apt-get install -y  make clang llvm libelf-dev libbpf-dev bpfcc-tools libbpfcc-dev linux-tools-$(uname -r) linux-headers-$(uname -r)
+
+
+# For RHEL8.2+
+sudo yum install libbpf-devel make clang llvm elfutils-libelf-devel bpftool bcc-tools bcc-devel
+
