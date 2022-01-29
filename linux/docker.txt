@@ -1,0 +1,82 @@
+docker安装
+
+
+docker常用命令
+
+# 输入 用户名（不是邮箱）、密码
+docker login
+
+# 查看镜像
+docker images
+
+# 查找进行
+docker search ubuntu
+
+# 下载镜像
+docker pull ubuntu:16.04
+
+docker run -it ubuntu --name dk1
+
+# 挂载主机目录
+docker run --name dk1 -it -v /path/host:/path/docker ubuntu:16.04 /bin/bash
+# centos共享目录无权限
+# 1. 增加--privileged=true
+# 2. setenforce 0 （setenforce 1）
+docker run --name dk1 -it -v /path/host:/path/docker --privileged=true ubuntu:16.04 /bin/bash
+
+# 查看容器
+docker ps -a
+docker ps
+
+docker ps -a -s
+
+
+# 启动、停止容器
+docker start 04282b772c28 
+docker start dk1
+docker stop 04282b772c28 
+
+# 进入运行的容器
+docker exec -it dk1 /bin/bash
+
+# 容器重命名
+docker rename my_container my_new_container
+
+# 查看容器配置
+docker inspect {docker name}
+
+# 修改镜像名称（）
+docker tag IMAGEID(镜像id) REPOSITORY:TAG
+
+# 保存、加载镜像
+docker save imageID > filename
+docker load < filename
+
+# 导出、导入容器
+docker export containID > filename
+docker import filename [newname]
+
+# 将镜像导出到文件
+docker export cbe3cb7799ed > update.tar
+# 创建一个新静像从基于导出的文件
+docker import - update < update.tar 
+
+# 提交镜像
+docker commit -m "modify info" -a "commit author" 042675ad9aff u:git
+
+# 查看docker空间占用情况
+docker system df
+docker system df -v
+
+
+映射端口
+docker run -d -it -p 8000:80 tang1:latest /bin/bash
+
+
+# docker已运行容器里修改时区 
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+或者
+cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+重启容器即可
+
