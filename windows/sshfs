@@ -1,0 +1,16 @@
+windows 映射网络驱动器
+
+# 远程 文件系统 
+
+1. 安装 winfsp/sshfs-win
+https://github.com/billziss-gh/winfsp
+https://github.com/billziss-gh/sshfs-win
+
+2. 映射网络驱动器
+\\sshfs.r\username@IP!PORT\abs_path
+
+
+
+参考：
+https://segmentfault.com/a/1190000023726408
+
