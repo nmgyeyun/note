@@ -1,0 +1,9 @@
+
+https://github.com/silenceshell/hcache
+
+查看系统cache占用情况
+
+hcache --top 10
+
+
+
