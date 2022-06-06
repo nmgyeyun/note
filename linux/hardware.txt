@@ -1,0 +1,21 @@
+
+dmidecode 
+
+# cpu
+
+# memory
+
+
+
+# pci
+lspci  -v
+lspci  -vv
+lspci  -vv -s 0e:00.0 
+
+
+
+# disk
+
+lsscsi
+hdparm -i /dev/sda
+hdparm -I /dev/sda
