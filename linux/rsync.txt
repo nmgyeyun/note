@@ -1,0 +1,1 @@
+rsync -arl -e 'ssh -p 22' /path/ USER@IP:/path

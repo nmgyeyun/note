@@ -1,0 +1,7 @@
+产品经理学AI（非研发，或研发人员入门）：https://easyai.tech/ai-knowledge-hub/
+研发人员：
+1、了解需求：需要学习传统人工智能 or 深度学习，还是都要
+2、前期准备：python编程基础，JupyterNotebook环境，numpy，pandas，DL框架（eg：pytorch）
+3、入门方案，可参考知乎问题：https://www.zhihu.com/question/26006703
+4、实践，可参考：https://github.com/MLEveryday/practicalAI-cn
+

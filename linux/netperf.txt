@@ -1,0 +1,10 @@
+
+
+
+netserver
+
+netperf -H 127.0.0.1 -t TCP_RR --  -o min_latency,max_latency,mean_latency
+
+netperf -H 127.0.0.1 -l 100 -t TCP_RR -v 2 -- -o min_latency,mean_latency,max_latency,stddev_latency,transaction_rate
+
+netperf -H 127.0.0.1 -l -1000 -t TCP_RR -w 10ms -b 1 -v 2 -- -O min_latency,mean_latency,max_latency,stddev_latency,transaction_rate
