@@ -1,4 +1,76 @@
 
+===========================================================================================================================
+
+# 配置team口
+nmcli connection add type team con-name team0 ifname team0 config '{"runner":{"name":"roundrobin"}}'
+nmcli connection modify team0 ipv4.addresses '10.5.228.229/16' 
+
+创建port接口
+nmcli connection add type team-slave con-name team0-eth4 ifname eth4 master team0 
+nmcli connection add type team-slave con-name team0-eth5 ifname eth5 master team0 
+
+启动team接口
+nmcli connection up team0 
+nmcli connection up team0-eth4
+nmcli connection up team0-eth5
+
+===========================================================================================================================
+
+
+# 配置子接口
+nmcli con add type vlan con-name team0.20 dev team0 id 20 ip4 10.20.10.10/24
+
+===========================================================================================================================
+
+# linux配置聚合口
+
+nmcli connection add type bond con-name bond0 ifname bond0
+
+
+nmcli connection add type bond-slave ifname eth4 master bond0 
+nmcli connection add type bond-slave ifname eth5 master bond0 
+
+
+nmcli connection modify bond0 ipv4.addresses '10.5.1.229/24' 
+
+
+# 参考
+https://www.cnblogs.com/kaishirenshi/p/10245228.html
+mode=6
+
+
+
+
+nmcli connection add type bond con-name bond0 ifname bond0
+
+
+nmcli connection add type bond-slave ifname eth4 master bond0 
+nmcli connection add type bond-slave ifname eth5 master bond0 
+
+
+nmcli connection modify bond0 ipv4.addresses '10.5.1.229/24' 
+
+# nmcli con add type bond ifname bond0 con-name bond0 mode balance-rr
+# nmcli con add type bond-slave ifname ens33 master bond0
+# nmcli con add type bond-slave ifname ens36 master bond0
+# nmcli con modify bond0 ipv4.address 192.168.1.100/24 ipv4.gateway 192.168.1.254 ipv4.dns 114.114.114.114 ipv4.method manual ipv6.method ignore
+
+
+nmcli con mod bond0 ipv4.method manual 
+nmcli con mod bond0 mode balance-rr
+
+
+nmcli connection up bond0 
+
+
+
+
+
+
+
+modprobe --first-time bonding
+
+
 ==============================================================================
 centos8 接口重命名
 
