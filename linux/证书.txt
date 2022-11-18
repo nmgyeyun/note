@@ -1,0 +1,45 @@
+
+# 生成证书
+
+# 1. 准备好目录和环境
+mkdir cert
+cd cert
+mkdir ca
+cd ca
+mkdir srl certs newcerts
+touch index.txt serial
+echo 1000 > serial
+cd ..
+cp /usr/lib/ssl/openssl.cnf .
+
+
+# 2. CA 生成根证书
+mkdir ca
+# 生成根证书私钥(key文件)
+openssl genrsa -out ca/ca.key 2048
+# 生成根证书签发申请文件(csr文件)
+openssl req -new -key ca/ca.key -out ca/ca.csr -config ./openssl.cnf
+# 自签发根证书(crt文件)
+openssl x509 -req -days 3650 -sha1 -extensions v3_ca -signkey ca/ca.key -in ca/ca.csr -out ca/ca.crt
+
+
+# 3. 用根证书签发server端证书
+mkdir server
+# 生成根证书私钥(key文件)
+openssl genrsa -out server/server.key 2048
+# 生成根证书签发申请文件(csr文件)
+openssl req -new -key server/server.key -out server/server.csr -config ./openssl.cnf
+# 使用根证书签发服务端证书
+openssl ca -in server/server.csr -out server/server.crt -cert ca/ca.crt -keyfile ca/ca.key -config ./openssl.cnf
+# 将密钥和证书合并成一个文件
+cp server/server.key server/server.pem
+cat server/server.crt >> server/server.pem
+
+
+# 4. 创建客户端证书
+mkdir client 
+openssl genrsa -aes256 -out client/client.key 2048
+openssl req -new -key client/client.key -out client/client.csr -config ./openssl.cnf
+openssl ca -in client/client.csr -out client/client.crt -cert ca/ca.crt -keyfile ca/ca.key -config ./openssl.cnf
+cp client/client.key client/client.pem
+cat client/client.crt >> client/client.pem
