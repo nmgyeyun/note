@@ -1,7 +1,7 @@
 
 
 
-##############################################################
+##################################################################################################
 # 签名算法 RSA/DSA
 
 # 生产秘钥对
@@ -15,3 +15,11 @@ openssl dgst  -sha256 -sign rsakey.pem -out sig.txt plain.txt
 
 # 验证签名
 openssl dgst  -sha256 -verify rsapub.pem  -signature sig.txt plain.txt 
+
+
+
+##################################################################################################
+# 性能
+openssl speed  rsa
+openssl speed  dsa
+openssl speed  ecdsa
