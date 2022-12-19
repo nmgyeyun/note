@@ -1,0 +1,17 @@
+
+
+
+##############################################################
+# 签名算法 RSA/DSA
+
+# 生产秘钥对
+openssl genrsa  -out rsakey.pem 1024
+
+openssl rsa -in rsakey.pem -pubout -out rsapub.pem
+echo "hello" > plain.txt
+
+# 签名生成
+openssl dgst  -sha256 -sign rsakey.pem -out sig.txt plain.txt 
+
+# 验证签名
+openssl dgst  -sha256 -verify rsapub.pem  -signature sig.txt plain.txt 
